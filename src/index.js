@@ -9,8 +9,7 @@ const app = express();
 
 const allowedOrigins = [
   "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app",
-  "http://localhost:3000",        // for local testing
-  "https://www.google.com",       // for console testing
+  "http://localhost:3000", // for local testing      
 ];
 
 app.use(cors({
