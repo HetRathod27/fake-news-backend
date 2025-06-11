@@ -7,9 +7,24 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 dotenv.config();
 const app = express();
 
+const allowedOrigins = [
+  "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app",
+  "http://localhost:3000",        // for local testing
+  "https://www.google.com",       // for console testing
+];
+
 app.use(cors({
-  origin: "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app/"  // replace this with your actual frontend URL
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like curl or Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  }
 }));
+
 
 // Initialize Gemini AI
 if (!process.env.GEMINI_API_KEY) {
@@ -21,7 +36,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
