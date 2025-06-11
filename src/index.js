@@ -7,6 +7,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 dotenv.config();
 const app = express();
 
+app.use(cors({
+  origin: "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app/"  // replace this with your actual frontend URL
+}));
+
 // Initialize Gemini AI
 if (!process.env.GEMINI_API_KEY) {
     console.error('GEMINI_API_KEY is not set in environment variables');
