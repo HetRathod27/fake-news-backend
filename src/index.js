@@ -9,8 +9,11 @@ const app = express();
 
 const allowedOrigins = [
   "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app",
-  "http://localhost:3000", // for local testing      
+  "https://fake-news-frontend-git-main-het-rathods-projects.vercel.app", // ✅ ADD THIS
+  "http://localhost:3000",
+  "https://www.google.com",
 ];
+
 
 app.use(cors({
   origin: function (origin, callback) {
