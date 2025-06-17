@@ -7,26 +7,26 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 dotenv.config();
 const app = express();
 
+// Configure CORS
 const allowedOrigins = [
-  "https://fake-news-frontend-jzm4qv95b-het-rathods-projects.vercel.app",
-  "https://fake-news-frontend-git-main-het-rathods-projects.vercel.app", // ✅ ADD THIS
-  "http://localhost:3000",
-  "https://www.google.com",
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://fake-news-detector.vercel.app'
 ];
 
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like curl or Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
-    }
-  }
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Access-Control-Allow-Origin'],
+    credentials: true,
+    preflightContinue: true
 }));
 
+// Handle preflight requests
+app.options('*', cors());
+
+// Parse JSON bodies
+app.use(express.json());
 
 // Initialize Gemini AI
 if (!process.env.GEMINI_API_KEY) {
@@ -36,9 +36,6 @@ if (!process.env.GEMINI_API_KEY) {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-// Middleware
-app.use(express.json());
 
 // MongoDB Connection
 const connectDB = async () => {
@@ -226,10 +223,19 @@ app.get('/api/history', async (req, res) => {
 app.delete('/api/history/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        await News.findByIdAndDelete(id);
-        res.json({ success: true });
+        const result = await News.findByIdAndDelete(id);
+        
+        if (!result) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+        
+        res.json({ success: true, message: 'Item deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Delete error:', error);
+        res.status(500).json({ 
+            error: 'Failed to delete item',
+            details: error.message 
+        });
     }
 });
 
