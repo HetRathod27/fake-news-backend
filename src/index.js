@@ -14,13 +14,22 @@ const allowedOrigins = [
     'https://fake-news-detector.vercel.app'
 ];
 
+// Enable CORS for all origins
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
+
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Access-Control-Allow-Origin'],
-    credentials: true,
-    preflightContinue: true
+    allowedHeaders: ['Content-Type', 'Accept'],
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Handle preflight requests
 app.options('*', cors());
